@@ -1,2 +1,2 @@
 # notification-service
-A service that enables sending message
+A service that enables sending messages
