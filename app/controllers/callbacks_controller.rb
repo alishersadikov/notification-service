@@ -1,4 +1,5 @@
-class CallbacksController < ApplicationController 
+# frozen_string_literal: true
+class CallbacksController < ApplicationController
   def text
-  end 
-end 
+  end
+end
