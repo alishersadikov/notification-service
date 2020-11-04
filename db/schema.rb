@@ -17,7 +17,7 @@ ActiveRecord::Schema.define(version: 2020_11_01_032248) do
 
   create_table "notifications", force: :cascade do |t|
     t.string "number"
-    t.text "text"
+    t.text "message"
     t.string "status"
     t.string "provider_url"
     t.uuid "external_id"
