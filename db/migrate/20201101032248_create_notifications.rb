@@ -2,7 +2,7 @@ class CreateNotifications < ActiveRecord::Migration[6.0]
   def change
     create_table :notifications do |t|
       t.string :number
-      t.text :text
+      t.text :message
       t.string :status
       t.string :provider_url
       t.uuid :external_id
