@@ -75,6 +75,8 @@ GEM
     factory_bot_rails (6.1.0)
       factory_bot (~> 6.1.0)
       railties (>= 5.0.0)
+    faker (2.14.0)
+      i18n (>= 1.6, < 2)
     ffi (1.13.1)
     formatador (0.2.5)
     globalid (0.4.2)
@@ -243,12 +245,14 @@ DEPENDENCIES
   byebug
   dotenv-rails
   factory_bot_rails
+  faker
   guard-rspec
   httparty
   jbuilder (~> 2.7)
   listen (~> 3.2)
   ngrok-tunnel
   pg (>= 0.18, < 2.0)
+  pry
   puma (~> 4.1)
   rails (~> 6.0.3, >= 6.0.3.4)
   rspec-rails (~> 4.0.1)
