@@ -1,37 +1,42 @@
 # frozen_string_literal: true
 class LoadBalancerService
-  def self.process(**args)
-    new(args).process
+  def self.process
+    new.process
   end
 
-  # KeyError if env var does not exist
-
-  def initialize(number:, message:)
-    @number = number
-    @message = message
+  def initialize
+    @provider_1_url = ENV.fetch('PROVIDER_1_URL')
+    @provider_2_url = ENV.fetch('PROVIDER_2_URL')
   end
 
   def process
-    QueueNotificationService.process(
-      number: @number,
-      message: @message,
-      provider_url: determine_provider_url
-    )
+    actual_ratio >= target_ratio ? @provider_2_url : @provider_1_url
   end
 
-  def determine_provider_url
-    provider_1_url = ENV.fetch('PROVIDER_1_URL')
-    provider_2_url = ENV.fetch('PROVIDER_2_URL')
-    provider_1_weight = ENV.fetch('PROVIDER_1_WEIGHT', '30')
-    provider_2_weight = ENV.fetch('PROVIDER_2_WEIGHT', '70')
+  def current_breakdown
+    @current_breakdown ||= Notification.where(status: 'queued').group(:provider_url).count
+  end
 
-    current_breakdown = Notification.where(status: 'queued').group(:provider_url).count
-    provider_1_load = current_breakdown[provider_1_url]
-    provider_2_load = current_breakdown[provider_2_url]
+  def provider_1_load
+    current_breakdown[@provider_1_url] || 0
+  end
 
-    actual_ratio = provider_1_load.to_f / provider_2_load
-    target_ratio = provider_1_weight.to_f / provider_2_weight.to_f
+  def provider_2_load
+    current_breakdown[@provider_2_url] || 0
+  end
 
-    actual_ratio > target_ratio ? provider_2_url : provider_1_url
+  def actual_ratio
+    @actual_ratio ||= calculate_actual_ratio
+  end
+
+  def target_ratio
+    provider_1_weight = ENV.fetch('PROVIDER_1_WEIGHT', '30').to_f
+    provider_2_weight = ENV.fetch('PROVIDER_2_WEIGHT', '70').to_f
+    @target_ratio ||= provider_1_weight / provider_2_weight
+  end
+
+  def calculate_actual_ratio
+    # dividing by zero is meaningless
+    provider_2_load.zero? ? target_ratio : provider_1_load.to_f / provider_2_load
   end
 end
