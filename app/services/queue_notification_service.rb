@@ -22,7 +22,7 @@ class QueueNotificationService
   def create_notification
     @notification = Notification.create!(
       number: @number,
-      text: @message,
+      message: @message,
       provider_url: @provider_url
     )
   end
@@ -34,7 +34,7 @@ class QueueNotificationService
 
     params = {
       "to_number": @notification.number,
-      "message": @notification.text,
+      "message": @notification.message,
       "callback_url": "#{ngrok_host}/delivery_status"
     }
 
