@@ -1,5 +1,17 @@
 # frozen_string_literal: true
-class CallbacksController < ApplicationController
-  def text
+class CallbacksController < ActionController::API
+  def text_message
+    Notification.find_by(external_id: callback_params[:message_id]).update(status: callback_params[:status])
+
+    render json: {
+      number: callback_params[:status],
+      message: callback_params[:message_id]
+    }, status: :accepted
+  end
+
+  private
+
+  def callback_params
+    params.require(:callback).permit(:status, :message_id)
   end
 end
