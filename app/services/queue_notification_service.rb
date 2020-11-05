@@ -20,7 +20,8 @@ class QueueNotificationService
       'callback_url': "#{ngrok_host}/delivery_status"
     }
 
-    @response = HTTParty.post(@notification.provider_url,
+    @response = HTTParty.post(
+      @notification.provider_url,
       body: body.to_json,
       headers: { 'Content-Type' => 'application/json' }
     )
@@ -29,13 +30,13 @@ class QueueNotificationService
   def process_response
     parsed_response = JSON.parse(@response.body)
     if @response.code == 200 && parsed_response['message_id']
-      @notification.update(external_id: parsed_response['message_id'])
-      return
+      @notification.update(external_id: parsed_response['message_id'], status: 'queued')
     end
 
-    if @response.code == 500
-      RetryNotificationService.process(parent: @notification, flip_provider: true)
-    end
+    return unless @response.code == 500
+
+    @notification.update(status: 'failed')
+    RetryNotificationService.process(parent: @notification, flip_provider: true)
   end
 
   def ngrok_host

@@ -30,7 +30,7 @@ RSpec.describe HandleNotificationRequestService do
   context '#create_notification' do
     it 'creates a record' do
       notification = double('notification',
-        :persisted? => true,
+        persisted?: true,
         number: number,
         message: message,
         provider_url: provider_url
@@ -39,7 +39,8 @@ RSpec.describe HandleNotificationRequestService do
       expect(Notification).to receive(:create!).with(
         number: number,
         message: message,
-        provider_url: provider_url
+        provider_url: provider_url,
+        status: 'created'
       ).and_return(notification)
 
       service.process
