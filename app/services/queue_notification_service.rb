@@ -4,40 +4,41 @@ class QueueNotificationService
     new(args).process
   end
 
-  def initialize(number:, message:)
-    @number = number
-    @message = message
+  def initialize(notification:)
+    @notification = notification
   end
 
   def process
-    determine_provider_url
-    create_notification
-    queue_notification
+    post_to_provider
+    process_response
   end
 
-  def determine_provider_url
-    @provider_url = LoadBalancerService.process
-  end
+  def post_to_provider
+    body = {
+      'to_number': @notification.number,
+      'message': @notification.message,
+      'callback_url': "#{ngrok_host}/delivery_status"
+    }
 
-  def create_notification
-    @notification = Notification.create!(
-      number: @number,
-      message: @message,
-      provider_url: @provider_url
+    @response = HTTParty.post(@notification.provider_url,
+      body: body.to_json,
+      headers: { 'Content-Type' => 'application/json' }
     )
   end
 
-  def queue_notification
-    return unless @notification
+  def process_response
+    parsed_response = JSON.parse(@response.body)
+    if @response.code == 200 && parsed_response['message_id']
+      @notification.update(external_id: parsed_response['message_id'])
+      return
+    end
 
-    ngrok_host = File.open('.ngrok_host').read
+    if @response.code == 500
+      # RetryNotificationService.process(notification: @notification)
+    end
+  end
 
-    params = {
-      "to_number": @notification.number,
-      "message": @notification.message,
-      "callback_url": "#{ngrok_host}/delivery_status"
-    }
-
-    HTTParty.post(@notification.provider_url, params: params.to_json)
+  def ngrok_host
+    File.open('.ngrok_host').read
   end
 end

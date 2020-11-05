@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 class Api::V1::NotificationsController < ActionController::API
   def create
-    QueueNotificationService.process(
+    HandleNotificationRequestService.process(
       number: notification_params[:number],
       message: notification_params[:message]
     )
