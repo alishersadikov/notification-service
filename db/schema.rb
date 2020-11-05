@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_11_01_032248) do
+ActiveRecord::Schema.define(version: 2020_11_05_023610) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -23,10 +23,13 @@ ActiveRecord::Schema.define(version: 2020_11_01_032248) do
     t.uuid "external_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.bigint "notification_id"
     t.index ["external_id"], name: "index_notifications_on_external_id"
+    t.index ["notification_id"], name: "index_notifications_on_notification_id"
     t.index ["number"], name: "index_notifications_on_number"
     t.index ["provider_url"], name: "index_notifications_on_provider_url"
     t.index ["status"], name: "index_notifications_on_status"
   end
 
+  add_foreign_key "notifications", "notifications"
 end
