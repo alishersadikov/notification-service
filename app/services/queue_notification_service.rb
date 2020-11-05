@@ -34,7 +34,7 @@ class QueueNotificationService
     end
 
     if @response.code == 500
-      # RetryNotificationService.process(notification: @notification)
+      RetryNotificationService.process(parent: @notification, flip_provider: true)
     end
   end
 
