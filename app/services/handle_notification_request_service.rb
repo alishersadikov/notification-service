@@ -19,14 +19,14 @@ class HandleNotificationRequestService
   end
 
   def determine_provider_url
-    @provider_url = LoadBalancerService.process
+    @provider_id = LoadBalancerService.process
   end
 
   def create_notification
     @notification = Notification.create!(
       number: @number,
       message: @message,
-      provider_url: @provider_url,
+      provider_id: @provider_id,
       status: 'created'
     )
   end

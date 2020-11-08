@@ -4,7 +4,9 @@ require 'rails_helper'
 
 RSpec.describe RetryNotificationService do
   let(:service) { RetryNotificationService }
-  let(:notification) { FactoryBot.create(:notification, :queued, :provider1) }
+  let(:provider) { FactoryBot.create(:provider) }
+  let(:provider2) { FactoryBot.create(:provider) }
+  let(:notification) { FactoryBot.create(:notification, :queued, provider: provider) }
 
   before do
     allow(QueueNotificationService).to receive(:process).and_return(true)
@@ -18,7 +20,15 @@ RSpec.describe RetryNotificationService do
   end
 
   context 'with flipped provider' do
+    it 'raises an exception if alternative provider is not available' do
+      expect(QueueNotificationService).to_not receive(:process)
+
+      expect { service.process(parent: notification, flip_provider: true) }.to raise_error(RetryNotificationService::NoAlternativeProviders)
+    end
+
     it 'creates and queues child notification' do
+      provider2 # create the alternative provider
+
       expect(QueueNotificationService).to receive(:process)
 
       service.process(parent: notification, flip_provider: true)
@@ -26,7 +36,7 @@ RSpec.describe RetryNotificationService do
       expect(notification.status).to eq(notification.child.status)
       expect(notification.message).to eq(notification.child.message)
       expect(notification.child.parent).to match(notification)
-      expect(notification.provider_url).to_not eq(notification.child.provider_url)
+      expect(notification.provider).to_not match(notification.child.provider)
     end
   end
 
@@ -39,22 +49,22 @@ RSpec.describe RetryNotificationService do
       expect(notification.status).to eq(notification.child.status)
       expect(notification.message).to eq(notification.child.message)
       expect(notification.child.parent).to match(notification)
-      expect(notification.provider_url).to eq(notification.child.provider_url)
+      expect(notification.provider).to match(notification.child.provider)
     end
   end
 
-  context '#alternative_provider_url' do
-    it 'returns the other provider\'s url' do
-      notification1 = FactoryBot.create(:notification, :queued, :provider1)
-      notification2 = FactoryBot.create(:notification, :queued, :provider2)
+  context '#alternative_provider' do
+    it 'returns the other provider' do
+      notification1 = FactoryBot.create(:notification, :queued, provider: provider)
+      notification2 = FactoryBot.create(:notification, :queued, provider: provider2)
 
       service = RetryNotificationService.new(parent: notification1, flip_provider: true)
 
-      expect(service.alternative_provider_url).to eq(ENV.fetch('PROVIDER_2_URL'))
+      expect(service.alternative_provider).to match(provider2)
 
       service = RetryNotificationService.new(parent: notification2, flip_provider: true)
 
-      expect(service.alternative_provider_url).to eq(ENV.fetch('PROVIDER_1_URL'))
+      expect(service.alternative_provider).to match(provider)
     end
   end
 end

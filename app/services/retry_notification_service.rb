@@ -5,6 +5,8 @@ class RetryNotificationService
     new(args).process
   end
 
+  NoAlternativeProviders = Class.new(StandardError)
+
   def initialize(parent:, flip_provider: false)
     @parent = parent
     @flip_provider = flip_provider
@@ -12,16 +14,18 @@ class RetryNotificationService
 
   def process
     child = @parent.dup
-    child.provider_url = alternative_provider_url if @flip_provider
+    child.provider = alternative_provider if @flip_provider
     child.save!
     @parent.child = child
 
     QueueNotificationService.process(notification: child)
   end
 
-  def alternative_provider_url
-    provider_urls = [ENV.fetch('PROVIDER_1_URL'), ENV.fetch('PROVIDER_2_URL')]
-    provider_urls.delete(@parent.provider_url)
-    provider_urls.first
+  def alternative_provider
+    provider = Provider.where.not(id: @parent.provider_id).first
+
+    raise NoAlternativeProviders unless provider
+
+    provider
   end
 end
