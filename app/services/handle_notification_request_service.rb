@@ -25,7 +25,8 @@ class HandleNotificationRequestService
     @notification = Notification.create!(
       number: @number,
       message: @message,
-      provider_url: @provider_url
+      provider_url: @provider_url,
+      status: 'created'
     )
   end
 

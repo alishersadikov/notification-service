@@ -34,7 +34,8 @@ RSpec.describe QueueNotificationService do
         body: { 'error': 'Something went wrong' }.to_json
       )
 
-      # expect(RetryNotificationService).to receive(:process).with(notification: notification)
+      expect(RetryNotificationService).to receive(:process)
+        .with(parent: notification, flip_provider: true)
 
       service.process(notification: notification)
 

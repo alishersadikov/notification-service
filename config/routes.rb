@@ -8,5 +8,5 @@ Rails.application.routes.draw do
     end
   end
 
-  post '/delivery_status', to: 'callbacks#text'
+  post '/delivery_status', to: 'callbacks#text_message'
 end
