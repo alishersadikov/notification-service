@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 class HandleCallbackService
   def self.process(**args)
     new(args).process

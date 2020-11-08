@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 class LoadBalancerService
   def self.process
     new.process

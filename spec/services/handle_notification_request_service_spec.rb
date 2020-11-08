@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe HandleNotificationRequestService do
@@ -30,11 +32,10 @@ RSpec.describe HandleNotificationRequestService do
   context '#create_notification' do
     it 'creates a record' do
       notification = double('notification',
-        persisted?: true,
-        number: number,
-        message: message,
-        provider_url: provider_url
-      )
+                            persisted?: true,
+                            number: number,
+                            message: message,
+                            provider_url: provider_url)
 
       expect(Notification).to receive(:create!).with(
         number: number,

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 class QueueNotificationService
   def self.process(**args)
     new(args).process

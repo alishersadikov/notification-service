@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe HandleCallbackService do
@@ -14,19 +16,19 @@ RSpec.describe HandleCallbackService do
 
   context '#initialize' do
     it 'expects external_id and status parameters' do
-      FactoryBot.create(:notification, :provider_1, :queued, external_id: external_id)
+      FactoryBot.create(:notification, :provider1, :queued, external_id: external_id)
 
       expect { HandleCallbackService.process }.to raise_error(ArgumentError)
 
-      expect {
+      expect do
         HandleCallbackService.process(external_id: external_id, status: 'delivered')
-      }.to_not raise_error
+      end.to_not raise_error
     end
   end
 
   context '#process' do
     it 'finds the notification based on the external_id and updates status' do
-      notification = FactoryBot.create(:notification, :provider_1, :queued, external_id: external_id)
+      notification = FactoryBot.create(:notification, :provider1, :queued, external_id: external_id)
 
       expect(Notification).to receive(:find_by!).with(external_id: external_id).and_return(notification)
       expect(notification).to receive(:update!)
@@ -35,21 +37,21 @@ RSpec.describe HandleCallbackService do
     end
 
     it 'raises an exception if notification not found' do
-      expect {
+      expect do
         HandleCallbackService.process(external_id: external_id, status: 'delivered')
-      }.to raise_error(ActiveRecord::RecordNotFound)
+      end.to raise_error(ActiveRecord::RecordNotFound)
     end
 
     it 'raises an exception if status is not supported' do
-      FactoryBot.create(:notification, :provider_1, :queued, external_id: external_id)
+      FactoryBot.create(:notification, :provider1, :queued, external_id: external_id)
 
-      expect {
+      expect do
         HandleCallbackService.process(external_id: external_id, status: 'unknown')
-      }.to raise_error(ActiveRecord::RecordInvalid, 'Validation failed: Status is not included in the list')
+      end.to raise_error(ActiveRecord::RecordInvalid, 'Validation failed: Status is not included in the list')
     end
 
     it 'does not retry if status is invalid or delivered' do
-      FactoryBot.create(:notification, :provider_1, :queued, external_id: external_id)
+      FactoryBot.create(:notification, :provider1, :queued, external_id: external_id)
 
       expect(RetryNotificationService).to_not receive(:process)
 
@@ -57,7 +59,7 @@ RSpec.describe HandleCallbackService do
     end
 
     it 'retries if status is failed' do
-      FactoryBot.create(:notification, :provider_1, :queued, external_id: external_id)
+      FactoryBot.create(:notification, :provider1, :queued, external_id: external_id)
 
       expect(RetryNotificationService).to receive(:process)
 
@@ -67,10 +69,10 @@ RSpec.describe HandleCallbackService do
 
   context 'retry limit' do
     it 'keeps retrying up to 3 generations' do
-      notification_1 = FactoryBot.create(:notification, :provider_1, status: 'failed', external_id: Faker::Internet.uuid)
+      notification1 = FactoryBot.create(:notification, :provider1, status: 'failed', external_id: Faker::Internet.uuid)
 
       external_id = Faker::Internet.uuid
-      notification_1.child = FactoryBot.create(:notification, :provider_1, :queued, external_id: external_id)
+      notification1.child = FactoryBot.create(:notification, :provider1, :queued, external_id: external_id)
 
       expect(RetryNotificationService).to receive(:process)
 
@@ -78,12 +80,12 @@ RSpec.describe HandleCallbackService do
     end
 
     it 'stops retrying after 3 generations' do
-      notification_1 = FactoryBot.create(:notification, :provider_1, status: 'failed', external_id: Faker::Internet.uuid)
-      notification_2 = FactoryBot.create(:notification, :provider_1, status: 'failed', external_id: Faker::Internet.uuid)
-      notification_1.child = notification_2
+      notification1 = FactoryBot.create(:notification, :provider1, status: 'failed', external_id: Faker::Internet.uuid)
+      notification2 = FactoryBot.create(:notification, :provider1, status: 'failed', external_id: Faker::Internet.uuid)
+      notification1.child = notification2
 
       external_id = Faker::Internet.uuid
-      notification_2.child = FactoryBot.create(:notification, :provider_1, status: 'failed', external_id: external_id)
+      notification2.child = FactoryBot.create(:notification, :provider1, status: 'failed', external_id: external_id)
 
       expect(RetryNotificationService).to_not receive(:process)
 
