@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe QueueNotificationService do
   let(:service) { QueueNotificationService }
-  let(:notification) { FactoryBot.create(:notification, :queued, :provider_1) }
-  let(:response) { {'message_id': 'e39b9fd2-3e4f-42e7-8c2c-1770773da8a8'} }
+  let(:notification) { FactoryBot.create(:notification, :queued, :provider1) }
+  let(:response) { { 'message_id': 'e39b9fd2-3e4f-42e7-8c2c-1770773da8a8' } }
 
   before do
     stub_request(:post, ENV['PROVIDER_1_URL']).to_return(

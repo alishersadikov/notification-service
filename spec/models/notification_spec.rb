@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe Notification do
@@ -86,7 +88,7 @@ RSpec.describe Notification do
     end
 
     it 'status must be present' do
-      %w(created queued invalid delivered failed).each do |status|
+      %w[created queued invalid delivered failed].each do |status|
         expect(
           Notification.new(
             number: Faker::Number.number(digits: 10),
@@ -110,32 +112,32 @@ RSpec.describe Notification do
 
   context '#direct_parent_count' do
     it 'returns 0 if no parent' do
-      notification = FactoryBot.create(:notification, :provider_1, :queued)
+      notification = FactoryBot.create(:notification, :provider1, :queued)
 
       expect(notification.parent).to be_nil
       expect(notification.direct_parent_count).to eq(0)
     end
 
     it 'returns 1 for direct parent' do
-      notification = FactoryBot.create(:notification, :provider_1, :queued)
-      notification.child = FactoryBot.create(:notification, :provider_1, :queued)
+      notification = FactoryBot.create(:notification, :provider1, :queued)
+      notification.child = FactoryBot.create(:notification, :provider1, :queued)
 
       expect(notification.child.parent).to be_present
       expect(notification.child.direct_parent_count).to eq(1)
     end
 
     it 'returns 0 for indirect parent' do
-      notification = FactoryBot.create(:notification, :provider_1, :queued)
-      notification.child = FactoryBot.create(:notification, :provider_2, :queued)
+      notification = FactoryBot.create(:notification, :provider1, :queued)
+      notification.child = FactoryBot.create(:notification, :provider2, :queued)
 
       expect(notification.child.parent).to be_present
       expect(notification.child.direct_parent_count).to eq(0)
     end
 
     it 'returns count for an uninterrupted chain/ancestry' do
-      notification = FactoryBot.create(:notification, :provider_1, :queued)
-      notification.child = FactoryBot.create(:notification, :provider_2, :queued)
-      notification.child.child = FactoryBot.create(:notification, :provider_2, :queued)
+      notification = FactoryBot.create(:notification, :provider1, :queued)
+      notification.child = FactoryBot.create(:notification, :provider2, :queued)
+      notification.child.child = FactoryBot.create(:notification, :provider2, :queued)
 
       expect(notification.child.child.parent).to be_present
       expect(notification.child.child.direct_parent_count).to eq(1)

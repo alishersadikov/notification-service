@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 class CallbacksController < ActionController::API
   def text_message
     HandleCallbackService.process(

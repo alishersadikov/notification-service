@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe LoadBalancerService do
@@ -8,7 +10,7 @@ RSpec.describe LoadBalancerService do
     end
 
     it 'load 1/0' do
-      FactoryBot.create(:notification, :provider_1, :queued)
+      FactoryBot.create(:notification, :provider1, :queued)
 
       expect(service.provider_1_load).to eq 1
       expect(service.provider_2_load).to eq 0
@@ -18,8 +20,8 @@ RSpec.describe LoadBalancerService do
     end
 
     it 'load 1/1' do
-      FactoryBot.create(:notification, :provider_1, :queued)
-      FactoryBot.create(:notification, :provider_2, :queued)
+      FactoryBot.create(:notification, :provider1, :queued)
+      FactoryBot.create(:notification, :provider2, :queued)
 
       expect(service.provider_1_load).to eq 1
       expect(service.provider_2_load).to eq 1
@@ -30,8 +32,8 @@ RSpec.describe LoadBalancerService do
     end
 
     it 'load 2/1' do
-      FactoryBot.create_list(:notification, 2, :provider_1, :queued)
-      FactoryBot.create(:notification, :provider_2, :queued)
+      FactoryBot.create_list(:notification, 2, :provider1, :queued)
+      FactoryBot.create(:notification, :provider2, :queued)
 
       expect(service.provider_1_load).to eq 2
       expect(service.provider_2_load).to eq 1
@@ -42,8 +44,8 @@ RSpec.describe LoadBalancerService do
     end
 
     it 'load 3/1' do
-      FactoryBot.create_list(:notification, 3, :provider_1, :queued)
-      FactoryBot.create(:notification, :provider_2, :queued)
+      FactoryBot.create_list(:notification, 3, :provider1, :queued)
+      FactoryBot.create(:notification, :provider2, :queued)
 
       expect(service.provider_1_load).to eq 3
       expect(service.provider_2_load).to eq 1
@@ -54,8 +56,8 @@ RSpec.describe LoadBalancerService do
     end
 
     it 'load 1/2' do
-      FactoryBot.create(:notification, :provider_1, :queued)
-      FactoryBot.create_list(:notification, 2, :provider_2, :queued)
+      FactoryBot.create(:notification, :provider1, :queued)
+      FactoryBot.create_list(:notification, 2, :provider2, :queued)
 
       expect(service.provider_1_load).to eq 1
       expect(service.provider_2_load).to eq 2
@@ -66,8 +68,8 @@ RSpec.describe LoadBalancerService do
     end
 
     it 'load 1/3' do
-      FactoryBot.create(:notification, :provider_1, :queued)
-      FactoryBot.create_list(:notification, 3, :provider_2, :queued)
+      FactoryBot.create(:notification, :provider1, :queued)
+      FactoryBot.create_list(:notification, 3, :provider2, :queued)
 
       expect(service.provider_1_load).to eq 1
       expect(service.provider_2_load).to eq 3
@@ -78,8 +80,8 @@ RSpec.describe LoadBalancerService do
     end
 
     it 'load 3/7' do
-      FactoryBot.create_list(:notification, 3, :provider_1, :queued)
-      FactoryBot.create_list(:notification, 7, :provider_2, :queued)
+      FactoryBot.create_list(:notification, 3, :provider1, :queued)
+      FactoryBot.create_list(:notification, 7, :provider2, :queued)
 
       expect(service.provider_1_load).to eq 3
       expect(service.provider_2_load).to eq 7
@@ -90,8 +92,8 @@ RSpec.describe LoadBalancerService do
     end
 
     it 'load 3/8' do
-      FactoryBot.create_list(:notification, 3, :provider_1, :queued)
-      FactoryBot.create_list(:notification, 8, :provider_2, :queued)
+      FactoryBot.create_list(:notification, 3, :provider1, :queued)
+      FactoryBot.create_list(:notification, 8, :provider2, :queued)
 
       expect(service.provider_1_load).to eq 3
       expect(service.provider_2_load).to eq 8
@@ -102,8 +104,8 @@ RSpec.describe LoadBalancerService do
     end
 
     it 'load 4/7' do
-      FactoryBot.create_list(:notification, 4, :provider_1, :queued)
-      FactoryBot.create_list(:notification, 7, :provider_2, :queued)
+      FactoryBot.create_list(:notification, 4, :provider1, :queued)
+      FactoryBot.create_list(:notification, 7, :provider2, :queued)
 
       expect(service.provider_1_load).to eq 4
       expect(service.provider_2_load).to eq 7

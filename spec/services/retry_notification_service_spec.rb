@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe RetryNotificationService do
   let(:service) { RetryNotificationService }
-  let(:notification) { FactoryBot.create(:notification, :queued, :provider_1) }
+  let(:notification) { FactoryBot.create(:notification, :queued, :provider1) }
 
   before do
     allow(QueueNotificationService).to receive(:process).and_return(true)
@@ -43,14 +45,14 @@ RSpec.describe RetryNotificationService do
 
   context '#alternative_provider_url' do
     it 'returns the other provider\'s url' do
-      notification_1 = FactoryBot.create(:notification, :queued, :provider_1)
-      notification_2 = FactoryBot.create(:notification, :queued, :provider_2)
+      notification1 = FactoryBot.create(:notification, :queued, :provider1)
+      notification2 = FactoryBot.create(:notification, :queued, :provider2)
 
-      service = RetryNotificationService.new(parent: notification_1, flip_provider: true)
+      service = RetryNotificationService.new(parent: notification1, flip_provider: true)
 
       expect(service.alternative_provider_url).to eq(ENV.fetch('PROVIDER_2_URL'))
 
-      service = RetryNotificationService.new(parent: notification_2, flip_provider: true)
+      service = RetryNotificationService.new(parent: notification2, flip_provider: true)
 
       expect(service.alternative_provider_url).to eq(ENV.fetch('PROVIDER_1_URL'))
     end
