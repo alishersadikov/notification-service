@@ -22,7 +22,7 @@ class QueueNotificationService
     }
 
     @response = HTTParty.post(
-      @notification.provider_url,
+      @notification.provider.url,
       body: body.to_json,
       headers: { 'Content-Type' => 'application/json' }
     )

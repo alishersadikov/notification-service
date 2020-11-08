@@ -6,10 +6,10 @@ RSpec.describe HandleNotificationRequestService do
   let(:number) { Faker::Number.number(digits: 10).to_s }
   let(:message) { Faker::Lorem.sentence(word_count: 3, supplemental: true) }
   let(:service) { HandleNotificationRequestService.new(number: number, message: message) }
-  let(:provider_url) { ENV['PROVIDER_1_URL'] }
+  let(:provider) { FactoryBot.create(:provider) }
 
   before do
-    allow(LoadBalancerService).to receive(:process).and_return(provider_url)
+    allow(LoadBalancerService).to receive(:process).and_return(provider.id)
     allow(QueueNotificationService).to receive(:process).and_return(true)
   end
 
@@ -35,12 +35,12 @@ RSpec.describe HandleNotificationRequestService do
                             persisted?: true,
                             number: number,
                             message: message,
-                            provider_url: provider_url)
+                            provider_id: provider.id)
 
       expect(Notification).to receive(:create!).with(
         number: number,
         message: message,
-        provider_url: provider_url,
+        provider_id: provider.id,
         status: 'created'
       ).and_return(notification)
 

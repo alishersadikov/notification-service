@@ -3,12 +3,13 @@
 require 'rails_helper'
 
 RSpec.describe QueueNotificationService do
+  let(:provider) { FactoryBot.create(:provider) }
   let(:service) { QueueNotificationService }
-  let(:notification) { FactoryBot.create(:notification, :queued, :provider1) }
+  let(:notification) { FactoryBot.create(:notification, :queued, provider: provider) }
   let(:response) { { 'message_id': 'e39b9fd2-3e4f-42e7-8c2c-1770773da8a8' } }
 
   before do
-    stub_request(:post, ENV['PROVIDER_1_URL']).to_return(
+    stub_request(:post, provider.url).to_return(
       status: 200,
       body: response.to_json
     )
@@ -31,7 +32,7 @@ RSpec.describe QueueNotificationService do
 
   context 'failure response' do
     it 'invokes the retry service ' do
-      stub_request(:post, ENV['PROVIDER_1_URL']).to_return(
+      stub_request(:post, provider.url).to_return(
         status: 500,
         body: { 'error': 'Something went wrong' }.to_json
       )
