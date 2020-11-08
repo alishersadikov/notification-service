@@ -5,39 +5,34 @@ class LoadBalancerService
     new.process
   end
 
-  def initialize
-    @provider_1_url = ENV.fetch('PROVIDER_1_URL')
-    @provider_2_url = ENV.fetch('PROVIDER_2_URL')
-  end
+  NoAvailableProviders = Class.new(StandardError)
 
   def process
-    actual_ratio >= target_ratio ? @provider_2_url : @provider_1_url
+    raise NoAvailableProviders if Provider.count.zero?
+
+    breakdown = calculated_breakdown
+
+    breakdown.each do |provider|
+      return provider['id'] if provider['load'] < (provider['weight'] / 100)
+    end
+
+    breakdown.first['id']
   end
 
-  def current_breakdown
-    @current_breakdown ||= Notification.where(status: 'queued').group(:provider_url).count
-  end
+  def calculated_breakdown
+    sql = <<-SQL
+      SELECT providers.id as id, providers.weight as weight, COALESCE(loads.current_load, 0) as load
+      FROM (
+        SELECT provider_id, COUNT(*) / CAST( SUM(count(*)) over () as float ) as current_load
+        FROM notifications
+        WHERE status = 'queued'
+        GROUP BY provider_id
+      ) AS loads
+      RIGHT JOIN providers ON loads.provider_id = providers.id
+      GROUP BY providers.id, providers.weight, loads.current_load
+      ORDER BY providers.id
+    SQL
 
-  def provider_1_load
-    current_breakdown[@provider_1_url] || 0
-  end
-
-  def provider_2_load
-    current_breakdown[@provider_2_url] || 0
-  end
-
-  def actual_ratio
-    @actual_ratio ||= calculate_actual_ratio
-  end
-
-  def target_ratio
-    provider_1_weight = ENV.fetch('PROVIDER_1_WEIGHT', '30').to_f
-    provider_2_weight = ENV.fetch('PROVIDER_2_WEIGHT', '70').to_f
-    @target_ratio ||= provider_1_weight / provider_2_weight
-  end
-
-  def calculate_actual_ratio
-    # dividing by zero is meaningless
-    provider_2_load.zero? ? target_ratio : provider_1_load.to_f / provider_2_load
+    ActiveRecord::Base.connection.execute(sql).to_a
   end
 end
