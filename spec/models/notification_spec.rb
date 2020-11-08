@@ -132,7 +132,7 @@ RSpec.describe Notification do
       expect(notification.child.direct_parent_count).to eq(0)
     end
 
-    it 'returns count for and uninterrupted chain/ancestry' do
+    it 'returns count for an uninterrupted chain/ancestry' do
       notification = FactoryBot.create(:notification, :provider_1, :queued)
       notification.child = FactoryBot.create(:notification, :provider_2, :queued)
       notification.child.child = FactoryBot.create(:notification, :provider_2, :queued)

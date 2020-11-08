@@ -10,7 +10,9 @@ class Notification < ApplicationRecord
   validates :provider_url, presence: true
   validates :status, inclusion: { in: %w[created queued invalid delivered failed] }
 
-  # direct in the sense that provider is shared
+  RETRY_LIMIT = 2
+
+  # direct means shared provider_url
   def direct_parent_count
     return 0 unless parent.present?
 

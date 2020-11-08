@@ -1,6 +1,11 @@
 # frozen_string_literal: true
 class CallbacksController < ActionController::API
   def text_message
+    HandleCallbackService.process(
+      external_id: callback_params[:message_id],
+      status: callback_params[:status]
+    )
+
     Notification.find_by(external_id: callback_params[:message_id]).update(status: callback_params[:status])
 
     render json: {
