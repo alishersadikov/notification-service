@@ -18,7 +18,7 @@ class QueueNotificationService
     body = {
       'to_number': @notification.number,
       'message': @notification.message,
-      'callback_url': "#{callback_host || ''}/delivery_status"
+      'callback_url': "#{callback_host}/delivery_status"
     }
 
     @response = HTTParty.post(
@@ -42,5 +42,6 @@ class QueueNotificationService
 
   def callback_host
     File.open('.ngrok_host').read if Rails.env.development?
+    ENV['NOTIFICATION_SERVICE_HOST']
   end
 end
