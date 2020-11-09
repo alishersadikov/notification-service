@@ -21,11 +21,14 @@ class QueueNotificationService
       'callback_url': "#{callback_host}/delivery_status"
     }
 
+
     @response = HTTParty.post(
       @notification.provider.url,
       body: body.to_json,
       headers: { 'Content-Type' => 'application/json' }
     )
+
+    Rails.logger.info "QueueNotificationService#process: provider response: '#{@response.inspect}'"
   end
 
   def process_response

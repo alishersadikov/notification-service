@@ -13,10 +13,15 @@ class LoadBalancerService
     breakdown = calculated_breakdown
 
     breakdown.each do |provider|
-      return provider['id'] if provider['load'] < (provider['weight'] / 100)
+      if provider['load'] < (provider['weight'] / 100)
+        Rails.logger.info "LoadBalancerService#process - sending to provider id: '#{provider['id']}'"
+        return provider['id']
+      end
     end
 
-    breakdown.first['id']
+    id = breakdown.first['id']
+    Rails.logger.info "LoadBalancerService#process - sending to provider id: '#{id}'"
+    id
   end
 
   def calculated_breakdown

@@ -14,6 +14,9 @@ class HandleNotificationRequestService
     determine_provider_url
     create_notification
     queue_notification
+
+    Rails.logger.info "HandleNotificationRequestService#process - "\
+      "queued, notification id: '#{@notification.id}'"
   end
 
   def determine_provider_url
