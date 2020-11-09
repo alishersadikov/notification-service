@@ -8,11 +8,9 @@ namespace :notifications do
     puts "Requested '#{quantity}' records"
 
     quantity.to_i.times do
-      Notification.create!(
+      HandleNotificationRequestService.process(
         number: Faker::Number.number(digits: 10).to_s,
         message: Faker::Lorem.sentence(word_count: 3, supplemental: true),
-        status: 'queued',
-        provider: Provider.all.sample
       )
     end
 
