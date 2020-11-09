@@ -32,7 +32,6 @@ RSpec.describe HandleNotificationRequestService do
   context '#create_notification' do
     it 'creates a record' do
       notification = double('notification',
-                            persisted?: true,
                             number: number,
                             message: message,
                             provider_id: provider.id)
@@ -46,16 +45,13 @@ RSpec.describe HandleNotificationRequestService do
 
       service.process
     end
+
+    it 'raises an exception if attributes are invalid' do
+      expect { HandleNotificationRequestService.process(number: nil, message: nil) }.to raise_error(ActiveRecord::RecordInvalid)
+    end
   end
 
   context '#queue_notification' do
-    it 'raises an exception if notification not persisted' do
-      # bypass notification creation
-      expect(Notification).to receive(:create!).and_return(nil)
-
-      expect { service.process }.to raise_error(HandleNotificationRequestService::PersistenceError)
-    end
-
     it 'delegates queueing to the dedicated service' do
       expect(QueueNotificationService).to receive(:process)
 

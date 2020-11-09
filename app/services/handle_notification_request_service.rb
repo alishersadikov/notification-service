@@ -5,8 +5,6 @@ class HandleNotificationRequestService
     new(args).process
   end
 
-  PersistenceError = Class.new(StandardError)
-
   def initialize(number:, message:)
     @number = number
     @message = message
@@ -32,8 +30,8 @@ class HandleNotificationRequestService
   end
 
   def queue_notification
-    raise PersistenceError unless @notification&.persisted?
-
     QueueNotificationService.process(notification: @notification)
+
+    @notification
   end
 end

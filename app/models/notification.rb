@@ -26,4 +26,8 @@ class Notification < ApplicationRecord
       parent.direct_parent_count
     end
   end
+
+  def provider_url
+    provider.url
+  end
 end
