@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class Notification < ApplicationRecord
-  attr_accessor :provider_url
-
   RETRY_LIMIT = 2
 
   has_one :child, class_name: 'Notification', foreign_key: 'notification_id'

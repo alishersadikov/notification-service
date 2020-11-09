@@ -5,8 +5,8 @@ Rails.application.routes.draw do
 
   namespace :api do
     namespace :v1 do
-      resources :notifications, only: [:index, :show, :create]
-      resources :providers, only: [:index, :show, :create]
+      resources :notifications, only: %i[index show create]
+      resources :providers, only: %i[index show create]
     end
   end
 
