@@ -80,5 +80,4 @@ test:
 #
 production:
   <<: *default
-  url: <%= ENV['DATABASE_URL] %>
-  database: notification_service_production
+  url: <%= ENV['DATABASE_URL'] %>
