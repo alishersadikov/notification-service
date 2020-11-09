@@ -11,6 +11,9 @@ class HandleNotificationRequestService
   end
 
   def process
+    Rails.logger.info 'HandleNotificationRequestService#process - '\
+      "number: '#{@number}', message: '#{@message}'"
+
     determine_provider_url
     create_notification
     queue_notification

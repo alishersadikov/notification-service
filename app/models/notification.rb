@@ -15,6 +15,7 @@ class Notification < ApplicationRecord
   validates :status, inclusion: { in: %w[created queued invalid delivered failed] }
 
   scope :queued, -> { where(status: 'queued') }
+  scope :failed, -> { where(status: 'failed') }
 
   # direct means shared provider_url
   def direct_parent_count

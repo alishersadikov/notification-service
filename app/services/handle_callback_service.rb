@@ -11,6 +11,9 @@ class HandleCallbackService
   end
 
   def process
+    Rails.logger.info 'HandleCallbackService#process - external_id: '\
+      "#{@external_id}', status: '#{@status}'"
+
     notification = Notification.find_by!(external_id: @external_id)
     notification.update!(status: @status)
 

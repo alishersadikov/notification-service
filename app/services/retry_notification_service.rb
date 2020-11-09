@@ -13,6 +13,9 @@ class RetryNotificationService
   end
 
   def process
+    Rails.logger.info 'RetryNotificationService#process - notification '\
+      "id: '#{@parent.id}', flip_provider: '#{@flip_provider}'"
+
     child = @parent.dup
     child.provider = alternative_provider if @flip_provider
     child.save!
