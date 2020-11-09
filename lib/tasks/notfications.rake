@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 namespace :notifications do
   desc 'Generate a single or multiple notifications'
-  task :generate, [:quantity] => [:environment] do |t, args|
+  task :generate, [:quantity] => [:environment] do |_t, args|
     quantity = args[:quantity].present? ? args[:quantity] : '1'
 
     puts "Requested '#{quantity}' records"

@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 namespace :providers do
   desc 'Recalibrate provider weights'
-  task :recalibrate, [:hours] => [:environment] do |t, args|
+  task :recalibrate, [:hours] => [:environment] do |_t, args|
     hours = args[:hours].present? ? args[:hours] : '1'
 
     puts "Requested time frame: '#{hours}' hours"
@@ -13,7 +15,7 @@ namespace :providers do
 
     breakdown.each do |provider_id, failure_count|
       provider = Provider.find_by!(id: provider_id)
-      delta = (average - failure_count ).to_f * 100 / all_failures
+      delta = (average - failure_count).to_f * 100 / all_failures
       new_weight = provider.weight + delta
 
       puts "Updating provider # '#{provider}' weight to'#{new_weight}'"

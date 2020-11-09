@@ -15,20 +15,23 @@ class QueueNotificationService
   end
 
   def post_to_provider
-    body = {
+    request_body = {
       'to_number': @notification.number,
       'message': @notification.message,
       'callback_url': "#{callback_host}/delivery_status"
     }
 
+    Rails.logger.info 'QueueNotificationService#process - provider '\
+      "request body: '#{request_body}'"
 
     @response = HTTParty.post(
       @notification.provider.url,
-      body: body.to_json,
+      body: request_body.to_json,
       headers: { 'Content-Type' => 'application/json' }
     )
 
-    Rails.logger.info "QueueNotificationService#process: provider response: '#{@response.inspect}'"
+    Rails.logger.info 'QueueNotificationService#process - provider '\
+      "response: '#{@response.inspect}'"
   end
 
   def process_response
@@ -44,7 +47,8 @@ class QueueNotificationService
   end
 
   def callback_host
-    File.open('.ngrok_host').read if Rails.env.development?
+    return File.open('.ngrok_host').read if Rails.env.development?
+
     ENV['NOTIFICATION_SERVICE_HOST']
   end
 end

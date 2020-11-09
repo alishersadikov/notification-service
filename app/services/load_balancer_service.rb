@@ -19,9 +19,9 @@ class LoadBalancerService
       end
     end
 
-    id = breakdown.first['id']
-    Rails.logger.info "LoadBalancerService#process - sending to provider id: '#{id}'"
-    id
+    provider_id = breakdown.first['id']
+    Rails.logger.info "LoadBalancerService#process - sending to provider id: '#{provider_id}'"
+    provider_id
   end
 
   def calculated_breakdown
