@@ -3,16 +3,28 @@
 module Api
   module V1
     class NotificationsController < ActionController::API
+      def index
+        notifications = NotificationSerializer.new(Notification.all).serializable_hash.to_json
+
+        render json: notifications, status: :ok
+      end
+
+      def show
+        notification = Notification.find(params[:id])
+
+        render json: NotificationSerializer.new(notification).serializable_hash.to_json, status: :ok
+      end
+
       def create
-        HandleNotificationRequestService.process(
+        notification = HandleNotificationRequestService.process(
           number: notification_params[:number],
           message: notification_params[:message]
         )
 
-        render json: {
-          number: notification_params[:number],
-          message: notification_params[:message]
-        }, status: :accepted
+        render json: NotificationSerializer.new(notification).serializable_hash.to_json, status: :ok
+
+      rescue ActiveRecord::RecordInvalid => e
+        render json: { error: e.message }, status: :bad_request
       end
 
       private
